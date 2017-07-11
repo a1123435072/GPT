@@ -30,4 +30,5 @@ dependencies {
     compile project(':PagerSlidingTabStrip_Lib')
     compile 'com.jakewharton:butterknife:8.7.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.7.0'
+    compile 'com.android.support:design:26.0.0-alpha1'
 }

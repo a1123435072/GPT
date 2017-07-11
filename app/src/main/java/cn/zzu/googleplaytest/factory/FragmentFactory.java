@@ -2,6 +2,10 @@ package cn.zzu.googleplaytest.factory;
 
 import android.support.v4.app.Fragment;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import cn.zzu.googleplaytest.base.BaseFragmet;
 import cn.zzu.googleplaytest.fragment.AppFragment;
 import cn.zzu.googleplaytest.fragment.CategoryFragment;
 import cn.zzu.googleplaytest.fragment.GameFragment;
@@ -24,9 +28,18 @@ public class FragmentFactory {
     public static final int FRAGMENT_CATEGORY = 5;//分类
     public static final int FRAGMENT_HOT = 6;//排行
 
-    public static Fragment createFragment(int position) {
+    /**用与缓存Fragment的事例*/
+    public static Map<Integer,BaseFragmet> mCcacheFragment = new HashMap<>();
+
+    public static BaseFragmet createFragment(int position) {
         //定义Fragment对象
-        Fragment fragment =null;
+        BaseFragmet fragment = null;
+
+        //优先从缓存集合中取出
+        if (mCcacheFragment.containsKey(position)){
+            fragment = mCcacheFragment.get(position);
+            return fragment;
+        }
         switch (position){
             case FRAGMENT_HOME://返回 首页 对象的fragment
                 fragment = new HomeFragment();
@@ -52,6 +65,9 @@ public class FragmentFactory {
             default:
                 break;
         }
+
+        //保存Fragment到集合中
+        mCcacheFragment.put(position,fragment);
         return fragment;
     }
 

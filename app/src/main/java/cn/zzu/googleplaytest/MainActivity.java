@@ -1,5 +1,6 @@
 package cn.zzu.googleplaytest;
 
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -10,12 +11,15 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.astuetz.PagerSlidingTabStripExtends;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.zzu.googleplaytest.base.BaseFragmet;
+import cn.zzu.googleplaytest.base.LoadingPager;
 import cn.zzu.googleplaytest.factory.FragmentFactory;
 import cn.zzu.googleplaytest.utils.LogUtils;
 import cn.zzu.googleplaytest.utils.UIUtils;
@@ -41,7 +45,56 @@ public class MainActivity extends AppCompatActivity {
         intiView();
         intiActionBarDrewerToggle();
         initData();
+        initListener();
 
+    }
+
+    /**
+     *
+     */
+    private void initListener() {
+        final MyOnpagerChangerListener myOnpagerChangerListener = new MyOnpagerChangerListener();
+
+        //监听ViewPager页面的切换  因为在 三方框架中已经为 viewPager设置了监听,
+        //重复设置监听会无效,所以我们对Tab设置监听,效果是一样的
+        mainTabs.setOnPageChangeListener(myOnpagerChangerListener);
+
+        mainViewpager.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                //ViewPager已经展示给用户看-->说明HomeFragment和AppFragment已经创建好了
+                //手动选中第一页，触发加载数据的方法
+                myOnpagerChangerListener.onPageSelected(0);
+                mainViewpager.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+            }
+        });
+    }
+
+    /**
+     * 界面改变的监听
+     */
+     class MyOnpagerChangerListener implements ViewPager.OnPageChangeListener{
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            //如果根据position找到对应的Fragment
+            BaseFragmet baseFragmet = FragmentFactory.mCcacheFragment.get(position);
+            //拿到Fragment里买你的额LoadingPager
+            LoadingPager loadingPager = baseFragmet.getmLoadingPager();
+            //触发加载数据
+            loadingPager.tiggerLoadingData();
+
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
     }
 
     private void initData() {
@@ -136,4 +189,6 @@ public class MainActivity extends AppCompatActivity {
             return mMainTitle[position];
         }
     }
+
+
 }
