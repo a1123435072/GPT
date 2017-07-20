@@ -9,18 +9,36 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.util.List;
 import java.util.Random;
 
 import cn.zzu.googleplaytest.base.BaseFragmet;
+import cn.zzu.googleplaytest.base.BaseHolder;
 import cn.zzu.googleplaytest.base.LoadingPager;
+import cn.zzu.googleplaytest.base.SupterBaseAdapter;
+import cn.zzu.googleplaytest.bean.SubjectBean;
+import cn.zzu.googleplaytest.factory.ListViewFactory;
+import cn.zzu.googleplaytest.holder.SubjectHolder;
+import cn.zzu.googleplaytest.protocol.SubjectProrocol;
+import cn.zzu.googleplaytest.utils.UIUtils;
 
 /**
  * Created by yangg on 2017/7/8.
  */
 
 public class SubjectFragment extends BaseFragmet {
+
+    private SubjectProrocol prorocol;
+    private List<SubjectBean> data;
+
+
 
     /**
      * 在子类中真正的实现加载具体的数据
@@ -29,13 +47,22 @@ public class SubjectFragment extends BaseFragmet {
      */
     @Override
     public LoadingPager.LoadedResult initDate() {
-        SystemClock.sleep(2000);//模拟耗时操作
 
-       Random random = new Random();
-        int index = random.nextInt(3);//0,1,2
-        LoadingPager.LoadedResult[] loadedResults = {LoadingPager.LoadedResult.SUCCESS, LoadingPager.LoadedResult.EMPTY, LoadingPager.LoadedResult.ERREOR};
+       // SubjectProrocol
+        prorocol = new SubjectProrocol();
 
-        return loadedResults[index];
+        try {
+
+            data = prorocol.loadData(0);
+
+            return checkResult(data);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return LoadingPager.LoadedResult.ERREOR;
+        }
+
+
     }
 
     /**
@@ -46,11 +73,53 @@ public class SubjectFragment extends BaseFragmet {
      */
     @Override
     protected View initSuccessVeiw() {
-        TextView successView = new TextView(getActivity());
-        successView.setText("SubjectFragment" );
-        successView.setTextColor(Color.RED);
-        successView.setGravity(Gravity.CENTER);
+      //view
+        ListView listView = ListViewFactory.createListView();
+        //data+-->成员变量中有
+        //data +view
 
-        return successView;
+        listView.setAdapter(new SubjectAdapter(data,listView));
+
+        return listView;
+    }
+
+
+
+    private class SubjectAdapter  extends SupterBaseAdapter<SubjectBean>{
+        public SubjectAdapter(List<SubjectBean> mDataSets, AbsListView mAbsListViews) {
+            super(mDataSets, mAbsListViews);
+        }
+
+
+        @Override
+        public BaseHolder getSpecialBaseHolder(int postion) {
+            return new SubjectHolder();
+        }
+        /**
+         * 有加载更多
+         */
+        @Override
+        public boolean hasLoadMore() {
+            return true;
+        }
+
+        @Override
+        public List onLoadMore() throws Exception {
+            SystemClock.sleep(2000);
+            List<SubjectBean> subjectBeen = prorocol.loadData(data.size());
+
+            return subjectBeen;
+        }
+
+        /**
+         * 条目的点击时间
+         */
+        @Override
+        public void onNormalitemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            //subjectBean
+            SubjectBean subjectBean = data.get(position);
+            Toast.makeText(UIUtils.getContext(),subjectBean.des,Toast.LENGTH_SHORT).show();
+        }
     }
 }

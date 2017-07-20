@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import cn.zzu.googleplaytest.R;
+import cn.zzu.googleplaytest.factory.ThreadPoolProcyFactory;
+
 import cn.zzu.googleplaytest.utils.LogUtils;
 import cn.zzu.googleplaytest.utils.UIUtils;
 
@@ -118,7 +120,9 @@ public abstract class LoadingPager extends FrameLayout {
                 refreshViewByStaste();
                 //异步加载
                 loadDataTask = new LoadDataTask();
-                new Thread(loadDataTask).start();
+                //new Thread(loadDataTask).start();
+                //我们使用单例的方式,,查un关键一个线程
+                ThreadPoolProcyFactory.getmNormalPoolProxy().submit(loadDataTask);
             }
         }
     }

@@ -8,6 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import cn.zzu.googleplaytest.utils.UIUtils;
 
 /**
@@ -66,7 +70,7 @@ public abstract class BaseFragmet extends Fragment {
      */
 
 
-    public abstract LoadingPager.LoadedResult initDate();
+    public abstract LoadingPager.LoadedResult initDate() ;
 
     /**
      * 决定成功视图张什么样子,(需要定义成功的视图)
@@ -78,5 +82,27 @@ public abstract class BaseFragmet extends Fragment {
      * @return
      */
     protected abstract View initSuccessVeiw();
+
+    /**
+     * 检验请求回来的数据
+     */
+    public LoadingPager.LoadedResult checkResult(Object resObj) {
+        if (resObj == null) {
+            return LoadingPager.LoadedResult.EMPTY;
+        }
+        if (resObj instanceof List) {
+            if (((List) resObj).size() == 0) {
+                return LoadingPager.LoadedResult.EMPTY;
+            }
+        }
+        if (resObj instanceof Map) {
+            if (((Map) resObj).size() == 0) {
+                return LoadingPager.LoadedResult.EMPTY;
+            }
+        }
+
+
+        return LoadingPager.LoadedResult.SUCCESS;
+    }
 
 }

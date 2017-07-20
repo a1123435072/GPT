@@ -15,6 +15,7 @@ import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.astuetz.PagerSlidingTabStripExtends;
+import com.facebook.drawee.backends.pipeline.Fresco;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
